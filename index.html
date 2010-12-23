@@ -1,0 +1,120 @@
+<html>
+<header>
+<title>Solutions to the L-99: Nintey-Nine Lisp Problems</title>
+</header>
+<body>
+
+<p><a href="http://www.ic.unicamp.br/~meidanis/courses/mc336/2006s2/funcional/L-99_Ninety-Nine_Lisp_Problems.html">L-99: Nintey-Nine Lisp Problems</a></p>
+
+<p>The solutions are:</p>
+<ol>
+<!-- 
+(loop
+ initially (insert "\n-->\n")
+  for i from 1 to 99
+   do (insert (format "<li><a href=\"p%02d.lisp\">p%02d.lisp</a></li>\n"  i i)))
+
+-->
+<li><a href="p01.lisp">p01.lisp</a></li>
+<li><a href="p02.lisp">p02.lisp</a></li>
+<li><a href="p03.lisp">p03.lisp</a></li>
+<li><a href="p04.lisp">p04.lisp</a></li>
+<li><a href="p05.lisp">p05.lisp</a></li>
+<li><a href="p06.lisp">p06.lisp</a></li>
+<li><a href="p07.lisp">p07.lisp</a></li>
+<li><a href="p08.lisp">p08.lisp</a></li>
+<li><a href="p09.lisp">p09.lisp</a></li>
+<li><a href="p10.lisp">p10.lisp</a></li>
+<li><a href="p11.lisp">p11.lisp</a></li>
+<li><a href="p12.lisp">p12.lisp</a></li>
+<li><a href="p13.lisp">p13.lisp</a></li>
+<li><a href="p14.lisp">p14.lisp</a></li>
+<li><a href="p15.lisp">p15.lisp</a></li>
+<li><a href="p16.lisp">p16.lisp</a></li>
+<li><a href="p17.lisp">p17.lisp</a></li>
+<li><a href="p18.lisp">p18.lisp</a></li>
+<li><a href="p19.lisp">p19.lisp</a></li>
+<li><a href="p20.lisp">p20.lisp</a></li>
+<li><a href="p21.lisp">p21.lisp</a></li>
+<li><a href="p22.lisp">p22.lisp</a></li>
+<li><a href="p23.lisp">p23.lisp</a></li>
+<li><a href="p24.lisp">p24.lisp</a></li>
+<li><a href="p25.lisp">p25.lisp</a></li>
+<li><a href="p26.lisp">p26.lisp</a></li>
+<li><a href="p27.lisp">p27.lisp</a></li>
+<li><a href="p28.lisp">p28.lisp</a></li>
+<li><a href="p29.lisp">p29.lisp</a></li>
+<li><a href="p30.lisp">p30.lisp</a></li>
+<li><a href="p31.lisp">p31.lisp</a></li>
+<li><a href="p32.lisp">p32.lisp</a></li>
+<li><a href="p33.lisp">p33.lisp</a></li>
+<li><a href="p34.lisp">p34.lisp</a></li>
+<li><a href="p35.lisp">p35.lisp</a></li>
+<li><a href="p36.lisp">p36.lisp</a></li>
+<li><a href="p37.lisp">p37.lisp</a></li>
+<li><a href="p38.lisp">p38.lisp</a></li>
+<li><a href="p39.lisp">p39.lisp</a></li>
+<li><a href="p40.lisp">p40.lisp</a></li>
+<li><a href="p41.lisp">p41.lisp</a></li>
+<li><a href="p42.lisp">p42.lisp</a></li>
+<li><a href="p43.lisp">p43.lisp</a></li>
+<li><a href="p44.lisp">p44.lisp</a></li>
+<li><a href="p45.lisp">p45.lisp</a></li>
+<li><a href="p46.lisp">p46.lisp</a></li>
+<li><a href="p47.lisp">p47.lisp</a></li>
+<li><a href="p48.lisp">p48.lisp</a></li>
+<li><a href="p49.lisp">p49.lisp</a></li>
+<li><a href="p50.lisp">p50.lisp</a></li>
+<li><a href="p51.lisp">p51.lisp</a></li>
+<li><a href="p52.lisp">p52.lisp</a></li>
+<li><a href="p53.lisp">p53.lisp</a></li>
+<li><a href="p54.lisp">p54.lisp</a></li>
+<li><a href="p55.lisp">p55.lisp</a></li>
+<li><a href="p56.lisp">p56.lisp</a></li>
+<li><a href="p57.lisp">p57.lisp</a></li>
+<li><a href="p58.lisp">p58.lisp</a></li>
+<li><a href="p59.lisp">p59.lisp</a></li>
+<li><a href="p60.lisp">p60.lisp</a></li>
+<li><a href="p61.lisp">p61.lisp</a></li>
+<li><a href="p62.lisp">p62.lisp</a></li>
+<li><a href="p63.lisp">p63.lisp</a></li>
+<li><a href="p64.lisp">p64.lisp</a></li>
+<li><a href="p65.lisp">p65.lisp</a></li>
+<li><a href="p66.lisp">p66.lisp</a></li>
+<li><a href="p67.lisp">p67.lisp</a></li>
+<li><a href="p68.lisp">p68.lisp</a></li>
+<li><a href="p69.lisp">p69.lisp</a></li>
+<li><a href="p70.lisp">p70.lisp</a></li>
+<li><a href="p71.lisp">p71.lisp</a></li>
+<li><a href="p72.lisp">p72.lisp</a></li>
+<li><a href="p73.lisp">p73.lisp</a></li>
+<li><a href="p74.lisp">p74.lisp</a></li>
+<li><a href="p75.lisp">p75.lisp</a></li>
+<li><a href="p76.lisp">p76.lisp</a></li>
+<li><a href="p77.lisp">p77.lisp</a></li>
+<li><a href="p78.lisp">p78.lisp</a></li>
+<li><a href="p79.lisp">p79.lisp</a></li>
+<li><a href="p80.lisp">p80.lisp</a></li>
+<li><a href="p81.lisp">p81.lisp</a></li>
+<li><a href="p82.lisp">p82.lisp</a></li>
+<li><a href="p83.lisp">p83.lisp</a></li>
+<li><a href="p84.lisp">p84.lisp</a></li>
+<li><a href="p85.lisp">p85.lisp</a></li>
+<li><a href="p86.lisp">p86.lisp</a></li>
+<li><a href="p87.lisp">p87.lisp</a></li>
+<li><a href="p88.lisp">p88.lisp</a></li>
+<li><a href="p89.lisp">p89.lisp</a></li>
+<li><a href="p90.lisp">p90.lisp</a></li>
+<li><a href="p91.lisp">p91.lisp</a></li>
+<li><a href="p92.lisp">p92.lisp</a></li>
+<li><a href="p93.lisp">p93.lisp</a></li>
+<li><a href="p94.lisp">p94.lisp</a></li>
+<li><a href="p95.lisp">p95.lisp</a></li>
+<li><a href="p96.lisp">p96.lisp</a></li>
+<li><a href="p97.lisp">p97.lisp</a></li>
+<li><a href="p98.lisp">p98.lisp</a></li>
+<li><a href="p99.lisp">p99.lisp</a></li>
+<ol>
+
+</body> 
+</html>

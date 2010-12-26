@@ -19,7 +19,7 @@ P34 (**) Calculate Euler's totient function phi(m).
 
 (defun totient-phi (m)
   (loop
-     :for r :from 1 :to m
+     :for r :from 1 :below m
      :when (coprime r m)
      :count 1))
 

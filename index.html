@@ -126,46 +126,6 @@ L-99: Nintey-Nine Lisp Problems</a>, (which themselves are derived from a list o
 <!--
 
    
-Binary Trees
-
-A binary tree is either empty or it is composed of a root element and
-two successors, which are binary trees themselves.  [p67]   
-
-In Lisp we represent the empty tree by 'nil' and the non-empty tree by
-the list (X L R), where X denotes the root node and L and R denote the
-left and right subtree, respectively. The example tree depicted
-opposite is therefore represented by the following list:
-
-(a (b (d nil nil) (e nil nil)) (c nil (f (g nil nil) nil)))
-
-Other examples are a binary tree that consists of a root node only:
-
-(a nil nil) or an empty binary tree: nil.
-
-You can check your predicates using these example trees. They are given as test cases in p54.lisp.
-
-P54A (*) Check whether a given term represents a binary tree
-    Write a predicate istree which returns true if and only if its argument is a list representing a binary tree.
-    Example:
-    * (istree (a (b nil nil) nil))
-    T
-    * (istree (a (b nil nil)))
-    NIL
-   
-P55 (**) Construct completely balanced binary trees
-    In a completely balanced binary tree, the following property holds for every node: The number of nodes in its left subtree and the number of nodes in its right subtree are almost equal, which means their difference is not greater
-    than one.
-   
-    Write a function cbal-tree to construct completely balanced binary trees for a given number of nodes. The predicate should generate all solutions via backtracking. Put the letter 'x' as information into all nodes of the tree.
-    Example:
-    * cbal-tree(4,T).
-    T = t(x, t(x, nil, nil), t(x, nil, t(x, nil, nil))) ;
-    T = t(x, t(x, nil, nil), t(x, t(x, nil, nil), nil)) ;
-    etc......No
-   
-P56 (**) Symmetric binary trees
-    Let us call a binary tree symmetric if you can draw a vertical line through the root node and then the right subtree is the mirror image of the left subtree. Write a predicate symmetric/1 to check whether a given binary tree is
-    symmetric. Hint: Write a predicate mirror/2 first to check whether one tree is the mirror image of another. We are only interested in the structure, not in the contents of the nodes.
    
 P57 (**) Binary search trees (dictionaries)
     Use the predicate add/3, developed in chapter 4 of the course, to write a predicate to construct a binary search tree from a list of integer numbers.

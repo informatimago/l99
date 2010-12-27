@@ -54,6 +54,7 @@
 (defpackage "COM.INFORMATIMAGO.RDP"
   (:use "COMMON-LISP")
   (:export "DEFGRAMMAR" "SEQ" "REP" "OPT" "ALT"
+           "GENERATE-GRAMMAR"
            
            "GRAMMAR" "MAKE-GRAMMAR" "COPY-GRAMMAR"
            "GRAMMAR-NAME" "GRAMMAR-TERMINALS" "GRAMMAR-START" "GRAMMAR-RULES"
@@ -70,8 +71,15 @@
 (in-package "COM.INFORMATIMAGO.RDP")
 
 
+(defstruct grammar
+  name terminals start rules
+  all-terminals
+  all-non-terminals)
+
+
 ;;; First, we define a grammar, with actions.
 ;;; The scanner and parser is generated at macro expansion time.
+
 
 (defmacro defgrammar (name &key terminals start rules (target-language :lisp))
   "
@@ -141,7 +149,7 @@ SEMANTICS:
         or the result of its single subform unchanged.
 
         The action for an ALT is to return the result of the selected 
-        alternatiev unchanged.
+        alternative unchanged.
 
         The default action for an internal SEQ is to return the list of the
         results of its subforms.
@@ -153,11 +161,11 @@ SEMANTICS:
 TODO:   We could also flatten sequences without action, or even sequences with
         actions with renumbering.
 "
-  (setf *linenum* 0)
-  (let* ((grammar (make-grammar :name name
-                                :terminals terminals
-                                :start start
-                                :rules (normalize-rules rules))))
+  (let ((grammar (make-grammar :name name
+                               :terminals terminals
+                               :start start
+                               :rules (normalize-rules rules)))
+        (*linenum* 0))
     (compute-all-terminals     grammar)
     (compute-all-non-terminals grammar)
     `(progn
@@ -171,20 +179,32 @@ TODO:   We could also flatten sequences without action, or even sequences with
                             (compute-all-terminals     ,g)
                             (compute-all-non-terminals ,g)
                             ,g))))
-       ,@(gen-boilerplate target-language)
+       
+       ,(gen-boilerplate target-language)
        ,(generate-scanner target-language grammar)
-       ,@(mapcar
-          (lambda (non-terminal)
-            (generate-nt-parser target-language grammar non-terminal))
-          (grammar-all-non-terminals grammar))
+       ,@(mapcar (lambda (non-terminal)
+                   (generate-nt-parser target-language grammar non-terminal))
+                 (grammar-all-non-terminals grammar))
        ,(generate-parser target-language grammar))))
 
 
 
-(defstruct grammar
-  name terminals start rules
-  all-terminals
-  all-non-terminals)
+(defun generate-grammar (name &key terminals start rules (target-language :lisp))
+  (let ((grammar (make-grammar :name name
+                               :terminals terminals
+                               :start start
+                               :rules (normalize-rules rules)))
+        (*linenum* 0))
+    (compute-all-terminals     grammar)
+    (compute-all-non-terminals grammar)
+    (eval `(progn
+             ,(gen-boilerplate target-language)
+             ,(generate-scanner target-language grammar)
+             ,@(mapcar (lambda (non-terminal)
+                         (generate-nt-parser target-language grammar non-terminal))
+                       (grammar-all-non-terminals grammar))
+             ,(generate-parser target-language grammar)))
+    grammar))
 
 
 
@@ -360,7 +380,8 @@ in the grammar."
 ;;; Generator -- LISP
 
 (defmethod gen-boilerplate ((target (eql :lisp)))
-  `(
+  `(progn
+     
     (defstruct scanner
       source
       function

@@ -30,21 +30,23 @@ P48 (**) Truth tables for logical expressions (3).
                              :for bit :from (1- width) :by -1
                              :for var :in variables
                              :collect (cons var
-                                            (if (logbitp i bit)
+                                            (if (logbitp bit i)
                                                 'true
-                                                'fail))))
+                                                'fail))))                
                 (v (evaluate-boolean expr bindings)))
            (format t "~{~:[fail~;true~] ~} ~:[fail~;true~]~%"
                    (mapcar (lambda (binding) (EQL 'TRUE (CDR BINDING))) BINDINGS)
                    V))))
 
-;; (TABLE '(A B C) (INFIX-TO-PREFIX '(A AND (B OR C) EQU A AND B OR A AND C)))
-;; fail fail fail  fail
-;; fail fail fail  fail
-;; fail fail fail  fail
-;; fail fail fail  fail
-;; fail fail fail  fail
-;; fail fail fail  fail
+;; (table '(a b c) (remove-identity (parse-logical-expression "(a and (b or c) equ a and b or a and c)")))
+;; true true true  true
+;; true true fail  true
+;; true fail true  true
 ;; true fail fail  true
-;; fail true fail  fail
+;; fail true true  true
+;; fail true fail  true
+;; fail fail true  true
+;; fail fail fail  true
 ;; --> NIL
+
+;;;; THE END ;;;;

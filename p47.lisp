@@ -15,7 +15,8 @@ P47 (*) Truth tables for logical expressions (2).
     fail fail fail
 "
 
-;; Again, this question doesn't make sense in lisp.
+;; Again, this question doesn't make much sense in lisp.
+;;
 ;; To have fun, we could interpret it as requesting parsing a list in
 ;; infix notation and translating it to prefix notation.
 ;;
@@ -74,114 +75,240 @@ P47 (*) Truth tables for logical expressions (2).
 ;; So we will write a parser that is parameterized by the precedences,
 ;; and we'll see later what is needed.
 
+;; For this, we use a simple recursive-descend parser generator:
 
-(defparameter *operators* '(( 2 1 :left :prefix not)
-                            ( 8 2 :left :infix  and nand)
-                            ( 9 2 :left :infix  xor equ)
-                            (10 2 :left :infix  or  nor)
-                            (12 2 :left :infix  impl)))
+(load "rdp.lisp")
+(use-package :com.informatimago.rdp)
 
 
 
-(defun parse-term (iexpr)
+;; Prefix or suffix operators must have arity = 1, and therefore
+;; don't have any specific associativity dirrection other than their
+;; being prefix or suffix.
+;; x not not not  not/1 suffix (((x not) not) not)
+;; not not not x  not/1 prefix (not (not (not x)))
+
+
+;; Infix operators must have an arity > 1 (usually 2), and must have
+;; either left or right associativity.
+;;
+;;  a op b op c   op/2 left    (a op b) op b
+;;  a op b op c   op/2 right   a op (b op c)
+
+
+
+;; We define an operator level as a list containing the precedence
+;; level (smaller number, higher precendence), the arity, the
+;; position-and-associativity (:prefix, :suffix, :infix-left or
+;; :infix-right), and the list of operators:
+
+
+(defstruct (level (:type list))
+  (precedence    0       :type integer)
+  (arity         0       :type integer)
+  (position      :prefix :type (member :prefix :suffix :infix-left :infix-right))
+  (operators     '()     :type list))
+
+
+
+(defun leftify (operators expr)
   "
-Parses:     term  := variable | constant | 'not' term | infix .
-Returns the parsed expression converted to prefix, and the rest (unparsed tokens).
+Transforms a right-associative operation tree EXPR of OPERATORS, into
+a leflt-associative one.   (op a (op b c)) --> (op (op a b) c)
 "
-  (let ((token (first iexpr)))
-   (cond
-     ((eql token 'true)  (values token (rest iexpr)))
-     ((eql token 'fail)  (values token (rest iexpr)))
-     ((eql token 'not)
-      (if (endp (rest iexpr))
-          (error "Missing a term after 'not'")
-          (multiple-value-bind (term rest) (parse-term (rest iexpr))
-            (values `(not ,term) rest))))
-     ((symbolp token)    (values token (rest iexpr)))
-     ((atom token)       (error "Invalid atom ~A in the infix iexpr." iexpr))
-     (t
-      (multiple-value-bind (expr rest) (parse-infix token)
-        (assert (endp rest) () "Remains unparsed tokens: ~A" rest)
-        (values expr (rest iexpr)))))))
+  (labels ((flatten (expr flattened)
+             (cond
+               ((atom expr) (cons expr flattened))
+               ((member (first expr) operators)
+                (flatten (third expr) (list* (first expr) (second expr) flattened)))
+               (t (cons expr flattened))))
+           (unflatten-left (expr flattened)
+             (if (endp flattened)
+                 expr
+                 (unflatten-left (list (first flattened) expr (second flattened))
+                                 (rest (rest flattened))))))
+    (let ((flattened (nreverse (flatten expr '()))))
+      (unflatten-left (first flattened) (rest flattened)))))
 
 
-(defun parse-infix (iexpr)
-  "
-Parses:     infix := '(' term | term { op term } ')' .
-            op    := 'and' | 'or' | 'nand' | 'nor' | 'xor' | 'impl' | 'equ' .
-Returns the parsed expression converted to prefix, and the rest (unparsed tokens).
-Note: In the returned prefix expression, all operators are binary, right associative.
-"
-  (assert (listp iexpr))
-  (multiple-value-bind (left rest) (parse-term iexpr)
-    (if (endp rest)
-        (values left rest)
-        (let ((op (first rest)))
-          (case op
-            ((and or nand nor xor impl equ)
-             (multiple-value-bind (right rest) (parse-infix (rest rest))
-               (values `(,op ,left ,right) rest)))
-            (otherwise
-             (error "Invalid operator '~A'" op)))))))
+(defun production-var (n)
+  "Makes a production variable $n"
+  (intern (format nil "$~A" n)))
 
 
-(defun infix-to-prefix (iexpr)
-  "
-term  := variable | constant | 'not' term | infix .
-infix := '(' term | term { op term } ')' .
-"
-  (multiple-value-bind (expr rest) (parse-infix iexpr)
-    (assert (endp rest) () "Remains unparsed tokens: ~A" rest)
-    expr))
+(defun token-to-lisp (token)
+  ;; rdp tokens are (terminal "text" position)
+  ;; Since we take care of naming our operator terminals as lisp
+  ;; operators, we can just extract them from the  tokens.
+  ;; For variables, we cl:read the text.
+  (if (atom token)
+      token
+      (case (first token)
+        ((identifier) (read-from-string (second token)))
+        ((true)       't)
+        ((fail)       'nil)
+        (otherwise    (first token)))))
 
 
-(defun test/infix-to-prefix ()
- (assert (equal
-          (mapcar (lambda (iexpr) (handler-case (infix-to-prefix iexpr)
-                                    (error (err) (princ err) (terpri) :error)))
-                  '((a-variable)
-                    (true)
-                    (fail)
-                    (not a-variable)
-                    (not true)
-                    (not fail)
-                    (not not not true)
-                    (a and b)
-                    (a and b and c and d)
-                    (a and b or not c and not d or e and not not f or g and h or not not not i)
-                    ((a and b) or (c and d))
-                    ((a or not (b and c)))
-                    (a and (b or not c) and (not d or e) and (not not f or g) and (h or not not not i))
-                    (a and 42)
-                    (a + b)
-                    (a and not)
-                    (not a b)))
-          '(A-VARIABLE
-            TRUE
-            FAIL
-            (NOT A-VARIABLE)
-            (NOT TRUE)
-            (NOT FAIL)
-            (NOT (NOT (NOT TRUE)))
-            (AND A B)
-            (AND A (AND B (AND C D)))
-            (AND A (OR B (AND (NOT C) (OR (NOT D) (AND E (OR (NOT (NOT F)) (AND G (OR H (NOT (NOT (NOT I)))))))))))
-            (OR (AND A B) (AND C D))
-            (OR A (NOT (AND B C)))
-            (AND A (AND (OR B (NOT C)) (AND (OR (NOT D) E) (AND (OR (NOT (NOT F)) G) (OR H (NOT (NOT (NOT I))))))))
-            :ERROR :ERROR :ERROR :ERROR)))
- :success)
+(defun generate-operator-level-rules (non-terminal inferior-non-terminal level)
+  "Generates a grammar rule to parse the given operator level, and
+build the corresponding expression tree."
+  (let ((op-non-terminal (intern (format nil "~A-OP" non-terminal))))
+    (ecase (level-position level)
 
-;; (test/infix-to-prefix)
-;; --> :SUCCESS
+      ((:prefix)
+       `((--> ,non-terminal
+              (alt ,op-non-terminal ,inferior-non-terminal)
+              :action $1)
+         (--> ,op-non-terminal
+              (alt ,@(level-operators level))
+              ,@(make-list (level-arity level) :initial-element inferior-non-terminal)
+              ;; (opt (seq (alt ,@(level-operators level))
+              ;;           ,@(make-list (level-arity level) :initial-element inferior-non-terminal))
+              ;;      ,inferior-non-terminal)
+              :action (list (token-to-lisp $1)
+                            ,@(loop
+                                 :repeat (level-arity level)
+                                 :for i :from 2 :collect (production-var i))))))
+
+      ((:suffix)
+       `((--> ,non-terminal
+              (alt ,op-non-terminal ,inferior-non-terminal)
+              :action $1)
+         (--> ,op-non-terminal
+              ,@(make-list (level-arity level) :initial-element inferior-non-terminal)
+              (alt ,@(level-operators level))
+              :action (list (token-to-lisp ,(production-var (1+ (level-arity level))))
+                            ,@(loop
+                                 :repeat  (level-arity level)
+                                 :for i :from 1 :collect (production-var i))))))
+
+      ;; We're using a recursive-descend parser, so we can have only
+      ;; right-recursive rules.  Therefore we will just collect the list
+      ;; of operations at the grammar level, and implement the
+      ;; associativity in the action.
+      ;;
+      ;; (--> factor
+      ;;      term op factor) ; :infix-right term op (term op term) 
+      ;; 
+      ;; (--> factor
+      ;;      factor op term) ; :infix-left  (term op term) op term
+      
+      ((:infix-left :infix-right)
+       (assert (= 2 (level-arity level))
+               (level) "Infix operators with an arity different from 2 are not implemented.")
+       `((--> ,non-terminal
+              ,op-non-terminal
+              :action ,(if (eql :infix-left (level-position level))
+                           `(if (and (listp $1) (= 3 (length $1)))
+                                (leftify ',(level-operators level) $1)
+                                $1)
+                           `$1))
+         (--> ,op-non-terminal
+              ,inferior-non-terminal (opt (alt ,@(level-operators level)) ,op-non-terminal)
+              :action (if $2
+                          (destructuring-bind (op right) $2
+                            (list (token-to-lisp op) $1 right))
+                          $1)))))))
 
 
-;; (table 'a 'b (infix-to-prefix '(a and (a or not b))))
+(defun generate-operator-grammar (name operator-levels)
+  "Generate a RDP grammar for the operators given in OPERATOR-LEVELS.
+This will create a function named PARSE-{NAME}."
+  (let* ((levels        (sort (copy-list operator-levels) (function >)
+                              :key (function level-precedence)))
+         (non-terminals (nconc (loop
+                                  :for level :in levels
+                                  :collect (intern (format nil "~{~A~^/~}-FACTOR" (level-operators level))))
+                               (list 'term)))
+         (terminals     (nconc (mapcan (lambda (level)
+                                         (mapcar (lambda (operator) (list operator (string-downcase operator)))
+                                                 (level-operators level)))
+                                       levels)
+                               '((true       "true")
+                                 (fail       "fail")
+                                 (identifier "[A-Za-z][-A-Za-z0-9]*"))))
+         (rules         `((--> ,(first (last non-terminals))
+                               (alt constant variable parenthesized-expression)
+                               :action $1)
+                          ;; We need to wrap terms in an identity operator to
+                          ;; avoid lefitification of the first non-terminal:
+                          ;; (a impl b) impl (c impl d) must stay that way.
+                          (--> parenthesized-expression
+                               "(" ,(first non-terminals) ")"
+                               :action (list 'identity $2))
+                          (--> constant (alt true fail)
+                               :action (token-to-lisp $1))
+                          (--> variable identifier
+                               :action (token-to-lisp $1))
+                          ,@(reduce (function append)
+                                    (mapcar (function generate-operator-level-rules)
+                                            non-terminals
+                                            (rest non-terminals)
+                                            levels)
+                                    :from-end t))))
+    #+debug
+    (print `(com.informatimago.rdp:generate-grammar
+             ,name
+             :terminals ',terminals
+             :start ',(first non-terminals)
+             :rules ',rules))
+    (com.informatimago.rdp:generate-grammar
+     name
+     :terminals terminals
+     :start (first non-terminals)
+     :rules rules)))
+
+
+
+
+
+(defparameter *operators* '(( 2 1 :prefix      (not))
+                            ( 8 2 :infix-left  (and nand))
+                            ( 9 2 :infix-left  (xor equ))
+                            (10 2 :infix-left  (or  nor))
+                            (12 2 :infix-left  (impl))))
+
+
+(generate-operator-grammar 'logical-expression *operators*)
+
+
+(defun test/operator-grammar ()
+  (loop
+     :for (source expected)
+     :in '(("a" a)
+           ("true" t)
+           ("fail" nil)
+           ("a and b" (and a b))
+           ("(a impl b) impl (c impl d)" (impl (identity (impl a b)) (identity (impl c d))))
+           ("a and b and c and d" (AND (AND (AND a b) c) D))
+           ("a and b and c or d and e and f or g and i and j"
+            (or (or (and (and a b) c) (and (and d e) f))  (and (and g i) j)))
+           ("(a xor b) equ (not a xor not b)"
+            (equ (identity (xor a b)) (identity (xor (not a) (not b))))))
+     :do (let ((result (handler-case (PARSE-LOGICAL-EXPRESSION source)
+                         (error (err) (princ err) (terpri) :error))))
+           (assert (equal result expected)
+                   (source)
+                   "Parsing the logical expression ~S~%               gave ~S ~%instead of expected ~S"
+                   source result expected)))
+  :success)
+
+
+(defun remove-identity (expr)
+  (cond
+    ((atom expr) expr)
+    ((eql 'identity (first expr)) (remove-identity (second expr)))
+    (t (cons (first expr) (mapcar (function remove-identity) (rest expr))))))
+
+
+;; (table 'a 'b (remove-identity (parse-logical-expression "a and (a or not b)")))
 ;; true true true
 ;; true fail true
 ;; fail true fail
 ;; fail fail fail
 ;; --> NIL
+
 
 
 ;;;; THE END ;;;;

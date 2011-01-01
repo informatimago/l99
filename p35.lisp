@@ -95,6 +95,7 @@ RETURN:   a SEXP of the form: (* uncomensurate-factor
             (cond
               ((and (listp factor) (eql 'expt (first factor)))
                (destructuring-bind (expt prime expo) factor
+                 (declare (ignore expt))
                  (make-list expo :initial-element prime)))
               (t (list factor))))
           (nreverse (cdr (factorize n)))))

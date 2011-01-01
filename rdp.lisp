@@ -80,6 +80,7 @@
 ;;; First, we define a grammar, with actions.
 ;;; The scanner and parser is generated at macro expansion time.
 
+(defvar *linenum* 0)
 
 (defmacro defgrammar (name &key terminals start rules (target-language :lisp))
   "
@@ -484,6 +485,7 @@ Please, update it use whatever regexp package is available in ~A"
       (ecase (car item)
         ((seq)
          (destructuring-bind (seq items actions) item
+           (declare (ignore seq))
            (let ((index 0))
              `(let ,(mapcar (lambda (item)
                               `(,(intern (format nil "$~D" (incf index)))

@@ -16,6 +16,7 @@ P36 (**) Determine the prime factors of a given positive integer (2).
             (cond
               ((and (listp factor) (eql 'expt (first factor)))
                (destructuring-bind (expt prime expo) factor
+                 (declare (ignore expt))
                  (list prime expo)))
               (t
                (list factor 1))))

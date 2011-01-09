@@ -32,7 +32,7 @@ P64 (**) Layout a binary tree (1)
 (load "p54a")
 
 
-;; To add the coordinate, we create a new structure, which inherits
+;; To add the coordinates, we create a new structure, which inherits
 ;; from the binary-tree structure, so we can reuse that abstraction.
 ;; However, including structures will make the new fields added at the
 ;; end of it.  The order of the fields should be immaterial (only that
@@ -90,28 +90,55 @@ Sets the abscissa of each node in the subtree NODE to a sequence of
 values starting from (1+ ABSCISSA) for the left-most node.
 Returns the last abscissa used.
 "
-  (cond
-    ((binary-tree-empty-p (binary-tree-left node))
-     (setf (layout-binary-tree-x node) (incf abscissa)))
-    ((binary-tree-empty-p (binary-tree-right node))
-     (setf (layout-binary-tree-x node)
-           (layout-node-abscissa/inorder (binary-tree-left node)
-                                         abscissa)))
-    (t
-     (layout-node-abscissa/inorder (binary-tree-right node)
-                                   (1+ (setf (layout-binary-tree-x node)
-                                             (layout-node-abscissa/inorder (binary-tree-left node)
-                                                                           abscissa)))))))
+  (when (binary-tree-left node)
+    (setf abscissa (layout-node-abscissa/inorder (binary-tree-left node) abscissa)))
+  (setf (layout-binary-tree-x node) (incf abscissa))
+  (when (binary-tree-right node)
+    (setf abscissa (layout-node-abscissa/inorder (binary-tree-right node) abscissa)))
+  abscissa)
 
-(defun layout-binary-tree/inorder/depth (tree)
-  ""
-  (let ((lobt (layout-node-depth tree 0)))
+
+(defun layout-binary-tree-p64 (tree)
+  (let ((lobt (layout-node-depth tree 1)))
     (layout-node-abscissa/inorder lobt 0) ; starts from 1; use -1 to start from 0.
     lobt))
 
 
-;; (layout-binary-tree/inorder/depth  (complete-binary-tree 5))
 
+(assert (equal (layout-binary-tree-p64  (complete-binary-tree 7))
+               '(1
+                 (2 (4 NIL NIL 1 3) (5 NIL NIL 3 3) 2 2)
+                 (3 (6 NIL NIL 5 3) (7 NIL NIL 7 3) 6 2)
+                 4 1)))
+
+(assert (equal (layout-binary-tree-p64   (construct '(n k c a h g e m u p s q) (function string<)))
+               '(N (K (C (A NIL NIL 1 4)
+                       (H (G (E NIL NIL 3 6)
+                             NIL 4 5)
+                          NIL 5 4)
+                       2 3)
+                    (M NIL NIL 7 3)
+                    6 2)
+                 (U (P NIL
+                       (S (Q NIL NIL 10 5)
+                          NIL 11 4)
+                       9 3)
+                    NIL 12 2)
+                 8 1)))
+
+(assert (equal (layout-binary-tree-p64   (construct '(n k c a e d g m u p q) (function string<)))
+               '(N (K (C (A NIL NIL 1 4)
+                       (E (D NIL NIL 3 5)
+                          (G NIL NIL 5 5)
+                          4 4)
+                       2 3)
+                    (M NIL NIL 7 3)
+                    6 2)
+                 (U (P NIL
+                       (Q NIL NIL 10 4)
+                       9 3)
+                    NIL 11 2)
+                 8 1)))
 
 ;;;; THE END ;;;;
 

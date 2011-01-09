@@ -129,12 +129,32 @@ Modifies the TREE, adding a new leaf labelled with the ITEM, ordered by LESSP."
       (binary-tree-add-items (make-binary-tree :label (first data)) (rest data) lessp)))
 
 
-;; (construct '(3 2 5 7 1) (function <))
-;; --> (3 (2 (1 NIL NIL) NIL) (5 NIL (7 NIL NIL)))
-;; (binary-tree-symetric-p (construct '(5 3 18 1 4 12 21) (function <)))
-;; --> T
-;; (binary-tree-symetric-p (construct '(3 2 5 7 1) (function <)))
-;; --> T
-;; (binary-tree-symetric-p (construct '(1 2 3 4 5) (function <)))
+
+(assert (equal (construct '(3 2 5 7 1) (function <))
+               '(3 (2 (1 NIL NIL) NIL) (5 NIL (7 NIL NIL)))))
+(assert (binary-tree-symetric-p (construct '(5 3 18 1 4 12 21) (function <))))
+(assert (binary-tree-symetric-p (construct '(3 2 5 7 1) (function <))))
+(assert (binary-tree-symetric-p (construct '(1 2 3 4 5) (function <))))
+
+(assert (equal
+         (construct '(n k c a e d g m u p q) (function string<))
+
+         (make-binary-tree
+          :label 'n
+          :left  (make-binary-tree
+                  :label 'k
+                  :left  (make-binary-tree
+                          :label 'c
+                          :left  (make-binary-tree :label 'a)
+                          :right (make-binary-tree
+                                  :label 'e
+                                  :left  (make-binary-tree :label 'd)
+                                  :right (make-binary-tree :label 'g)))
+                  :right (make-binary-tree :label 'm))
+          :right (make-binary-tree
+                  :label 'u
+                  :left (make-binary-tree
+                         :label 'p
+                         :right (make-binary-tree :label 'q))))))
 
 ;;;; THE END ;;;;

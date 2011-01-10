@@ -62,6 +62,13 @@ P54A (*) Check whether a given term represents a binary tree
 ;; (binary-tree-p (binary-tree-from-sexp '(a (b (d nil nil) (e nil nil)) (c nil nil))))
 
 
+(defun binary-tree-height (tree)
+  (if (binary-tree-empty-p tree)
+      0
+      (+ 1 (max (binary-tree-height (binary-tree-left tree))
+                (binary-tree-height (binary-tree-right tree))))))
+
+
 
 
 (defparameter *tree-0* 'nil)

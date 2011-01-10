@@ -24,11 +24,6 @@ P65 (**) Layout a binary tree (2)
 (load "p54a")
 
 
-(defun binary-tree-height (tree)
-  (if (binary-tree-empty-p tree)
-      0
-      (+ 1 (max (binary-tree-height (binary-tree-left tree))
-                (binary-tree-height (binary-tree-right tree))))))
 
 (defun binary-tree-count-leftmosts (tree)
   (if (binary-tree-empty-p tree)
@@ -80,5 +75,41 @@ The abscissa of the children is offset by (expt 2 height).
                     NIL 23 2) 15 1)))
 
 
+;; (list
+;;  (draw-laid-out-tree (layout-binary-tree-p65 (complete-binary-tree 7)))
+;;  (draw-laid-out-tree (layout-binary-tree-p65 (construct '(n k c a e d g m u p q)   (function string<))))
+;;  (draw-laid-out-tree (layout-binary-tree-p65 (construct '(n k c a h g e m u p s q) (function string<)))))
+;; 
+;; (                                
+;;         1                       
+;;        / \                      
+;;     2       3                   
+;;    / \     / \                  
+;;   4   5   6   7                 
+;; 
+;;                                                                                                  
+;;                               N                                                                 
+;;                              / \                                                                
+;;               K                               U                                                 
+;;              / \                             /                                                  
+;;       C               M               P                                                         
+;;      / \                               \                                                        
+;;   A       E                               Q                                                     
+;;          / \                                                                                    
+;;         D   G                                                                                   
+;; 
+;;                                                                                                                                                                                          
+;;                                                           N                                                                                                                             
+;;                                                          / \                                                                                                                            
+;;                           K                                                               U                                                                                             
+;;                          / \                                                             /                                                                                              
+;;           C                               M                               P                                                                                                             
+;;          / \                                                               \                                                                                                            
+;;   A               H                                                               S                                                                                                     
+;;                  /                                                               /                                                                                                      
+;;               G                                                               Q                                                                                                         
+;;              /                                                                                                                                                                          
+;;             E                                                                                                                                                                           
+;; )
 
 ;;;; THE END ;;;;

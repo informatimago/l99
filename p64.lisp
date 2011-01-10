@@ -105,6 +105,49 @@ Returns the last abscissa used.
 
 
 
+(defun binary-tree-rightmost-node (tree)
+  (unless (binary-tree-empty-p tree)
+    (if (binary-tree-empty-p (binary-tree-right tree))
+        tree
+        (binary-tree-rightmost-node (binary-tree-right tree)))))
+
+
+(defun draw-laid-out-node (node picture)
+  (let* ((label  (princ-to-string (binary-tree-label node)))
+         (lab    (case (length label)
+                   ((0) " . ")
+                   ((1) (format nil " ~A " label))
+                   ((2) (format nil " ~A"  label))
+                   ((3) label)
+                   (otherwise (subseq label 0 3))))
+         (height (com.informatimago.common-lisp.picture.picture:height picture))
+         (2x     (* 2 (layout-binary-tree-x node)))
+         (2y     (- height (* 2 (layout-binary-tree-y node)))))
+    (com.informatimago.common-lisp.picture.picture:draw-string
+     picture (1- 2x) 2y lab)
+    (when (binary-tree-left node)
+      (com.informatimago.common-lisp.picture.picture:draw-string
+       picture (1- 2x) (1- 2y) "/")
+      (draw-laid-out-node (binary-tree-left node) picture))
+    (when (binary-tree-right node)
+      (com.informatimago.common-lisp.picture.picture:draw-string
+       picture (1+ 2x) (1- 2y) "\\")
+      (draw-laid-out-node (binary-tree-right node) picture))
+    picture))
+
+
+(defun draw-laid-out-tree (tree)
+  (let* ((height    (* 2 (binary-tree-height tree)))
+         (rightmost (binary-tree-rightmost-node tree))
+         (width     (* 4 (1+ (layout-binary-tree-x rightmost))))
+         ;;   N  
+         ;;  / \
+         ;; K   U
+         (picture   (make-instance 'com.informatimago.common-lisp.picture.picture:picture
+                        :width width :height height)))
+    (draw-laid-out-node tree picture)))
+
+
 (assert (equal (layout-binary-tree-p64  (complete-binary-tree 7))
                '(1
                  (2 (4 NIL NIL 1 3) (5 NIL NIL 3 3) 2 2)
@@ -139,6 +182,44 @@ Returns the last abscissa used.
                        9 3)
                     NIL 11 2)
                  8 1)))
+
+;; (list
+;;  (draw-laid-out-tree (layout-binary-tree-p64 (complete-binary-tree 7)))
+;;  (draw-laid-out-tree (layout-binary-tree-p64 (construct '(n k c a e d g m u p q)   (function string<))))
+;;  (draw-laid-out-tree (layout-binary-tree-p64 (construct '(n k c a h g e m u p s q) (function string<)))))
+;; 
+;; (                                
+;;         1                       
+;;        / \                      
+;;     2       3                   
+;;    / \     / \                  
+;;   4   5   6   7                 
+;; 
+;;                                                  
+;;                 N                               
+;;                / \                              
+;;             K         U                         
+;;            / \       /                          
+;;     C         M   P                             
+;;    / \             \                            
+;;   A     E           Q                           
+;;        / \                                      
+;;       D   G                                     
+;; 
+;;                                                      
+;;                 N                                   
+;;                / \                                  
+;;             K           U                           
+;;            / \         /                            
+;;     C         M   P                                 
+;;    / \             \                                
+;;   A       H           S                             
+;;          /           /                              
+;;         G           Q                               
+;;        /                                            
+;;       E                                             
+;; )
+
 
 ;;;; THE END ;;;;
 

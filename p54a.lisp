@@ -30,9 +30,22 @@ P54A (*) Check whether a given term represents a binary tree
 ;; Notice that  there are a lot of ways to represent trees.
 ;; Therefore it important to use a functional abstraction, to avoid
 ;; writing code dependant on a specific representation.
+;;
+;; Also, in the following problems, references to prolog terms are not
+;; translated to lisp, and terms for trees are given as:
+;; 
+;;     T = t(x, t(x, nil, nil), t(x, nil, t(x, nil, nil))) 
+;; 
+;; We could translate this as having the symbol BINARY-TREE prefixing the
+;; lists representing tree nodes:
+;; 
+;;     (BINARY-TREE a (BINARY-TREE b nil nil) (BINARY-TREE c nil (BINARY-TREE f nil)))
+;; 
+;; This can be trivially implemented by adding the :NAMED option to defstruct, in which
+;; case an implementation of BINARY-TREE-P is provided by destruct.
 
 
-(defstruct (binary-tree (:type list))
+(defstruct (binary-tree (:type list) :named)
   label left right)
 ;; This defstruct defines the following functional abstraction:
 ;; (make-binary-tree :label label :left left :right right)

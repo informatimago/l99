@@ -14,6 +14,10 @@
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2011-01-12 <PJB> Added grammar parameter to functions
+;;;;                     generating function names so that different
+;;;;                     grammars with non-terminals named the same
+;;;;                     don't collide.
 ;;;;    2006-09-09 <PJB> Created
 ;;;;BUGS
 ;;;;
@@ -32,7 +36,7 @@
 ;;;;LEGAL
 ;;;;    GPL
 ;;;;    
-;;;;    Copyright Pascal Bourguignon 2006 - 2006
+;;;;    Copyright Pascal Bourguignon 2006 - 2011
 ;;;;    
 ;;;;    This program is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU General Public License
@@ -181,7 +185,7 @@ TODO:   We could also flatten sequences without action, or even sequences with
                             (compute-all-non-terminals ,g)
                             ,g))))
        
-       ,(gen-boilerplate target-language)
+       ,(gen-boilerplate target-language grammar)
        ,(generate-scanner target-language grammar)
        ,@(mapcar (lambda (non-terminal)
                    (generate-nt-parser target-language grammar non-terminal))
@@ -199,7 +203,7 @@ TODO:   We could also flatten sequences without action, or even sequences with
     (compute-all-terminals     grammar)
     (compute-all-non-terminals grammar)
     (eval `(progn
-             ,(gen-boilerplate target-language)
+             ,(gen-boilerplate target-language grammar)
              ,(generate-scanner target-language grammar)
              ,@(mapcar (lambda (non-terminal)
                          (generate-nt-parser target-language grammar non-terminal))
@@ -380,7 +384,8 @@ in the grammar."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Generator -- LISP
 
-(defmethod gen-boilerplate ((target (eql :lisp)))
+(defmethod gen-boilerplate ((target (eql :lisp)) (grammar grammar))
+  (declare (ignore grammar))
   `(progn
      
     (defstruct scanner
@@ -409,8 +414,8 @@ in the grammar."
       (format nil "^[~{~C~}]\\+" '(#\space #\newline #\tab)))))
 
 
-(defmethod gen-scanner-function-name ((target (eql :lisp)) grammar-name)
-  (intern (format nil "SCAN-~A" grammar-name)))
+(defmethod gen-scanner-function-name ((target (eql :lisp)) (grammar grammar))
+  (intern (format nil "~:@(SCAN-~A~)" (grammar-name grammar))))
 
 (defmethod generate-scanner ((target (eql :lisp)) grammar)
   #-clisp (error "This generator uses the clisp specific package REGEXP
@@ -428,7 +433,7 @@ Please, update it use whatever regexp package is available in ~A"
                                        (grammar-all-terminals grammar))
                         (function >) :key (function length))))))
     `(defun
-         ,(gen-scanner-function-name target (grammar-name grammar))
+         ,(gen-scanner-function-name target grammar)
          (scanner)
        (let ((match (regexp:match *spaces*
                                   (scanner-source scanner)
@@ -462,8 +467,8 @@ Please, update it use whatever regexp package is available in ~A"
                      (scanner-position scanner))))))))
 
 
-(defmethod gen-parse-function-name ((target (eql :lisp)) non-terminal)
-  (intern (format nil "PARSE-~A" non-terminal)))
+(defmethod gen-parse-function-name ((target (eql :lisp)) (grammar grammar) non-terminal)
+  (intern (format nil "~:@(~A/PARSE-~A~)" (grammar-name grammar) non-terminal)))
 
 (defmethod gen-in-firsts ((target (eql :lisp)) firsts)
   (if (null (cdr firsts))
@@ -471,14 +476,14 @@ Please, update it use whatever regexp package is available in ~A"
       `(member  (scanner-current-token scanner) ',firsts
                 :test (function word-equal))))
 
-(defmethod gen-parsing-statement ((target (eql :lisp)) grammar item)
+(defmethod gen-parsing-statement ((target (eql :lisp)) (grammar grammar) item)
   (if (atom item)
       (if (terminalp grammar item)
           `(accept scanner ',item)
           (let* ((firsts (first-rhs grammar item))
                  (emptyp (member nil firsts)))
             `(,(if emptyp 'when 'if) ,(gen-in-firsts target (remove nil firsts))
-               (,(gen-parse-function-name target item) scanner)
+               (,(gen-parse-function-name target grammar item) scanner)
                ,@(unless emptyp
                          '((error "Unexpected token ~S"
                             (scanner-current-token scanner)))))))
@@ -509,21 +514,22 @@ Please, update it use whatever regexp package is available in ~A"
                       (cdr item)))))))
 
 
-(defmethod generate-nt-parser ((target (eql :lisp)) grammar non-terminal)
-  `(defun ,(gen-parse-function-name target non-terminal) (scanner)
+(defmethod generate-nt-parser ((target (eql :lisp)) (grammar grammar) non-terminal)
+  `(defun ,(gen-parse-function-name target grammar non-terminal) (scanner)
      ,(gen-parsing-statement target grammar  (find-rule grammar non-terminal))))
 
 
 (defmethod generate-parser ((target (eql :lisp)) grammar)
   (let ((scanner-function
-         (gen-scanner-function-name target (grammar-name grammar))))
-    `(defun ,(gen-parse-function-name target (grammar-name grammar))
+         (gen-scanner-function-name target grammar)))
+    `(defun ; ,(gen-parse-function-name target grammar (grammar-name grammar))
+         ,(intern (format nil "~:@(PARSE-~A~)" (grammar-name grammar)))
          (source)
        (let ((scanner (make-scanner :source source
                                     :function (function ,scanner-function))))
          (,scanner-function scanner)
-         (prog1 (,(gen-parse-function-name target
-                                           (grammar-start grammar)) scanner)
+         (prog1 (,(gen-parse-function-name target grammar (grammar-start grammar))
+                  scanner)
            (unless (scanner-end-of-source scanner)
              (error "End of source NOT reached.")))))))
 

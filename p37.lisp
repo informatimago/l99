@@ -14,13 +14,14 @@ P37 (**) Calculate Euler's totient function phi(m) (improved).
     Note that a ** b stands for the b'th power of a.
 "
 
+;;; https://secure.wikimedia.org/wikipedia/en/wiki/Euler%27s_totient_function#Computing_Euler.27s_function
 
 (defun phi (m)
   ;;   (p1 - 1) * p1 ** (m1 - 1)
   ;; + (p2 - 1) * p2 ** (m2 - 1)
   ;; + (p3 - 1) * p3 ** (m3 - 1)
   ;; + ...
-  (reduce (function +)
+  (reduce (function *)
           (mapcar (lambda (item)
                     (destructuring-bind (p-i m-i) item
                       (* (1- p-i) (expt p-i (1- m-i)))))

@@ -190,6 +190,11 @@ An undirected edge. The order of the two nodes in the edge-nodes list
 is irrelevant.
 "))
 
+(defgeneric edges-with-node (graph node)
+  (:documentation "Returns a list of the edges in GRAPH associating the given NODE.")
+  (:method ((g graph) node) (edges-with-node (slot-value g 'representation) node)))
+
+
 
 (defclass directed-graph (graph)
   ()
@@ -204,6 +209,20 @@ Undirected graphs can have only representations with arcs.
 A directed arc, from the FROM node to the TO node.
 Note: the API allow for unidrected
 "))
+
+
+(defgeneric arcs-from-node (graph node)
+  (:documentation "Returns a list of the arcs in GRAPH from the  NODE.
+\(the adjacency list).")
+  (:method ((g graph) node) (arcs-from-node (slot-value g 'representation) node)))
+
+(defgeneric arcs-to-node (graph node)
+  (:documentation "Returns a list of the arcs in GRAPH to the  NODE.")
+  (:method ((g graph) node) (arcs-to-node (slot-value g 'representation) node)))
+
+
+
+
 
 
 
@@ -270,6 +289,7 @@ Return EDGE.")
 
 
 
+
 (defgeneric arcs (gr)
   (:documentation "Returns the list of arcs in the graph or graph representation.
 If the graph or graph representation is undirected, then each edge produces two arcs.")
@@ -297,9 +317,7 @@ then it's added before.  Return the new ARC.")
   (:documentation "
 If ARC is an arc of the graph or graph representation,then remove it.
 The nodes are not changed.  Return ARC.")
-  (:method ((g directed-graph) node) (remove-arc (slot-value g 'representation) arc)))
-
-
+  (:method ((g directed-graph) arc) (remove-arc (slot-value g 'representation) arc)))
 
 
 (defgeneric to-sexp (object)
@@ -369,10 +387,10 @@ Returns GR.
   (declare (ignore key test test-not))
   (multiple-value-bind (vars vals store-vars writer-form reader-form)
       (get-setf-expansion sequence-place)
+    (when (cdr store-vars)
+      (error "Cannot DELETE from a place with multiple values."))
     `(let* (,@(mapcar (function list) vars vals)
             (,(car store-vars) ,reader-form))
-       (when (cdr store-vars)
-         (error "Cannot DELETE from a place with multiple values."))
        (setf ,(car store-vars) (delete ,item ,(car store-vars) ,@args))
        ,writer-form)))
 
@@ -403,12 +421,15 @@ Returns GR.
                         :collect (first nodes) :collect (second nodes))))
 
 (defmethod add-node ((gr edge-list-representation) node)
+  (declare (ignore gr node))
   (error "Cannot add isolated nodes to a graph represented by a list of edges."))
 
 (defmethod remove-node ((gr edge-list-representation) node)
   (setf (edges gr) (delete-if (lambda (edge) (member node (edge-nodes edge))) (edges gr)))
   node)
 
+(defmethod edges-with-node ((gr edge-list-representation) node)
+  (remove-if-not (lambda (edge) (member node (edge-nodes edge))) (edges gr)))
 
 
 ;;; Edge list and nodes representation
@@ -472,16 +493,19 @@ Returns GR.
   node)
 
 
+(defun make-adjacency-list-arcs-from (from)
+  (lambda (to)
+    (make-instance 'arc
+        :from from
+        :to (link-node to)
+        :properties (copy-list (properties to)))))
+
+
 (defmethod arcs ((gr adjacency-list-representation))
   (let ((arcs '()))
     (maphash (lambda (from adjacents)
-               (setf arcs (nconc (mapcar (lambda (to)
-                                           (make-instance 'arc
-                                               :from from
-                                               :to (link-node to)
-                                               :properties (copy-list (properties to))))
-                                         adjacents)
-                                 arcs)))
+               (setf arcs (nconc (mapcar (make-adjacency-list-arcs-from from)
+                                         adjacents) arcs)))
              (adjacency-list gr))
     arcs))
 
@@ -495,10 +519,20 @@ Returns GR.
       :properties (copy-list properties)))
 
 (defmethod remove-arc ((gr adjacency-list-representation) arc)
-  (deletef to (gethash (arc-from arc) (adjacency-list gr)))
+  (deletef arc (gethash (arc-from arc) (adjacency-list gr)))
   arc)
 
+(defmethod arcs-from-node ((gr adjacency-list-representation) from)
+  (mapcar (make-adjacency-list-arcs-from from)
+          (gethash from (adjacency-list gr))))
 
+(defmethod arcs-to-node ((gr adjacency-list-representation) to)
+  (let ((arcs '()))
+    (maphash (lambda (from adjacents)
+               (when (member to adjacents)
+                 (setf arcs (nconc (funcall (make-adjacency-list-arcs-from from) to) arcs))))
+             (adjacency-list gr))
+    arcs))
 
 ;;; 
 
@@ -549,14 +583,13 @@ Returns GR.
 
 (defmethod copy-from ((g graph) (other graph))
   "Make G a graph equal to OTHER"
-  (clear-representation)
+  (clear-representation g)
   ;; Just out of lazyness, we go thru sexps.
   (from-sexp (slot-value g 'representation) (to-sexp other))
   ;; if a faster conversion is required, we could get (nodes other)
-  ;; and (edges other) or (arcs other) and loop of them to add them to
+  ;; and (edges other) or (arcs other) and loop on them to add them to
   ;; the target graph.
   g)
 
 
-;;; THE END ;;;
-
+;;;; THE END ;;;;

@@ -162,20 +162,11 @@ directed-graph and undirected-graph that can be represented in several
 ways.
 "))
 
-(defmethod print-object ((self graph) stream)
-  (print-unreadable-object (self stream :identity t :type t)
-    (let ((rep-name  (class-name (class-of (slot-value self 'representation)))))
-     (format stream "as a~:[~;n~] ~A" (find (char (string rep-name) 0) "AEIOUY") rep-name))
-    (format stream " with ~A node~:*~P and ~A edge~:*~P"
-            (length (nodes self)) (length (edges self))))
-  self)
-
 (defclass undirected-graph (graph)
   ()
   (:documentation "
 Undirected graphs can have only representations with edges.
 "))
-
 
 (defclass attributes ()
   ((property-list :initform '()
@@ -189,6 +180,15 @@ Undirected graphs can have only representations with edges.
 An undirected edge. The order of the two nodes in the edge-nodes list
 is irrelevant.
 "))
+
+(defmethod print-object ((self undirected-graph) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (let ((rep-name  (class-name (class-of (slot-value self 'representation)))))
+     (format stream "as a~:[~;n~] ~A" (find (char (string rep-name) 0) "AEIOUY") rep-name))
+    (format stream " with ~A node~:*~P and ~A edge~:*~P"
+            (length (nodes self)) (length (edges self))))
+  self)
+
 
 (defgeneric edges-with-node (graph node)
   (:documentation "Returns a list of the edges in GRAPH associating the given NODE.")
@@ -209,6 +209,14 @@ Undirected graphs can have only representations with arcs.
 A directed arc, from the FROM node to the TO node.
 Note: the API allow for unidrected
 "))
+
+(defmethod print-object ((self directed-graph) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (let ((rep-name  (class-name (class-of (slot-value self 'representation)))))
+     (format stream "as a~:[~;n~] ~A" (find (char (string rep-name) 0) "AEIOUY") rep-name))
+    (format stream " with ~A node~:*~P and ~A arc~:*~P"
+            (length (nodes self)) (length (arcs self))))
+  self)
 
 
 (defgeneric arcs-from-node (graph node)
@@ -430,6 +438,17 @@ Returns GR.
 
 (defmethod edges-with-node ((gr edge-list-representation) node)
   (remove-if-not (lambda (edge) (member node (edge-nodes edge))) (edges gr)))
+
+
+(defmethod arcs-from-node ((gr edge-list-representation) from)
+  (mapcar (lambda (edge)
+            (make-instance 'arc :from from :to (first (remove from (edge-nodes edge)))))
+          (edges-with-node gr from)))
+
+(defmethod arcs-to-node ((gr edge-list-representation) to)
+  (mapcar (lambda (edge)
+            (make-instance 'arc :to to :from (first (remove to (edge-nodes edge)))))
+          (edges-with-node gr to)))
 
 
 ;;; Edge list and nodes representation

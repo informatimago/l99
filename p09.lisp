@@ -20,7 +20,7 @@ P09 (**) Pack consecutive duplicates of list elements into sublists.
 (defun group (list)
   (labels ((group-run (element group list)
              (cond
-               ((null list) (list (cons element result)))
+               ((null list) (list (cons element group)))
                ((eql element (first list)) (group-run element (cons element group) (rest list)))
                (t (cons (cons element group) (group-run (first list) '() (rest list)))))))
     (if (null list)

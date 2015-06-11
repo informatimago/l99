@@ -57,4 +57,5 @@ infinite number of them… "
 ;; ((P M ((P Q :WEIGHT 9) (M Q :WEIGHT 7) (P M :WEIGHT 5))) ((P M) (P Q M))) 
 ;; NIL
 
+
 ;;;; THE END ;;;;

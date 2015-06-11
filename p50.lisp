@@ -24,7 +24,7 @@ P50 (***) Huffman code.
 The algorithm described in:
 \"A Method for the Construction of Minimum-Redundancy Codes\"
 David A. Huffman, Procedings of the I.R.E.
-http://compression.ru/download/articles/huff/huffman_1952_minimum-redundancy-codes.pdf
+<http://compression.ru/download/articles/huff/huffman_1952_minimum-redundancy-codes.pdf>
 is:
 
 compute huffman code:

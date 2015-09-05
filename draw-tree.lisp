@@ -1,7 +1,7 @@
 ;;;; -*- coding:utf-8 -*-
 
-(asdf:oos 'asdf:load-op :com.informatimago.common-lisp.cesarum)
-(asdf:oos 'asdf:load-op :com.informatimago.common-lisp.picture)
+(ql:quickload :com.informatimago.common-lisp.cesarum)
+(ql:quickload :com.informatimago.common-lisp.picture)
 
 
 ;; ─ ━ │ ┃ ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋ ┌ ┍ ┎ ┏ ┐ ┑ ┒ ┓ └ ┕ ┖ ┗ ┘ ┙ ┚ ┛ ├ ┝ ┞ ┟ ┠ ┡
@@ -10,20 +10,20 @@
 ;; ╦ ╧ ╨ ╩ ╪ ╫ ╬ ╭ ╮ ╯ ╰ ╱ ╲ ╳ ╴ ╵ ╶ ╷ ╸ ╹ ╺ ╻ ╼ ╽ ╾ ╿
 
 (defparameter *unicode-box*
-  '(:TOP-LEFT     "╔"
-    :TOP-RIGHT    "╗"
-    :BOTTOM-LEFT  "╚"
-    :BOTTOM-RIGHT "╝"
-    :TOP          "═"
-    :BOTTOM       "═"
-    :LEFT         "║"
-    :RIGHT        "║"))
+  '(:top-left     "╔"
+    :top-right    "╗"
+    :bottom-left  "╚"
+    :bottom-right "╝"
+    :top          "═"
+    :bottom       "═"
+    :left         "║"
+    :right        "║"))
 
 (defparameter *unicode-line*
-  '(:TOP-LEFT     "┌"
-    :TOP-RIGHT    "┐"
-    :BOTTOM-LEFT  "└"
-    :BOTTOM-RIGHT "┘"
+  '(:top-left     "┌"
+    :top-right    "┐"
+    :bottom-left  "└"
+    :bottom-right "┘"
     :horizontal   "─"
     :vertical     "│"
     :bottom-butt  "╧"
@@ -33,20 +33,20 @@
 
 
 (defparameter *ascii-box*
-  '(:TOP-LEFT     "+"
-    :TOP-RIGHT    "+"
-    :BOTTOM-LEFT  "+"
-    :BOTTOM-RIGHT "+"
-    :TOP          "-"
-    :BOTTOM       "-"
-    :LEFT         "|"
-    :RIGHT        "|"))
+  '(:top-left     "+"
+    :top-right    "+"
+    :bottom-left  "+"
+    :bottom-right "+"
+    :top          "-"
+    :bottom       "-"
+    :left         "|"
+    :right        "|"))
 
 (defparameter *ascii-line*
-  '(:TOP-LEFT     "+"
-    :TOP-RIGHT    "+"
-    :BOTTOM-LEFT  "+"
-    :BOTTOM-RIGHT "+"
+  '(:top-left     "+"
+    :top-right    "+"
+    :bottom-left  "+"
+    :bottom-right "+"
     :horizontal   "-"
     :vertical     "|"
     :bottom-butt  "-"
@@ -140,36 +140,36 @@ vertical-height-below  2        2     0
 
 (defun draw-tree-view (view x y pict)
   (if (binary-tree-empty-p (subtree-view-node view))
-      (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-string
+      (com.informatimago.common-lisp.picture.picture:draw-string
        pict x y (subtree-view-label view))
       (let ((line-x  (+ x (subtree-view-label-box-width view) -3))
             (above-y (+ y (max 2 (subtree-view-vertical-height-above view))))
             (below-y (- y (max 2 (subtree-view-vertical-height-below view)))))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-line
+        (com.informatimago.common-lisp.picture.picture:draw-line
          pict line-x below-y 0 (+ 1 
                                   (subtree-view-vertical-height-above view)
                                   (subtree-view-vertical-height-below view))
          :foreground (getf *line* :vertical))
 
-        (apply (function COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:frame-rect)
+        (apply (function com.informatimago.common-lisp.picture.picture:frame-rect)
                pict x (1- y) (subtree-view-label-box-width view) 3 *box*)
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-point
+        (com.informatimago.common-lisp.picture.picture:draw-point
          pict x y (getf *line* :right-butt))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-string
+        (com.informatimago.common-lisp.picture.picture:draw-string
          pict (+ 2 x) y (subtree-view-label view))
         
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-line
+        (com.informatimago.common-lisp.picture.picture:draw-line
          pict line-x above-y 5 0 :foreground (getf *line* :horizontal))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-point
+        (com.informatimago.common-lisp.picture.picture:draw-point
          pict line-x (1+ y)  (getf *line* :bottom-butt))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-point
+        (com.informatimago.common-lisp.picture.picture:draw-point
          pict line-x above-y (getf *line* :top-left))
 
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-line
+        (com.informatimago.common-lisp.picture.picture:draw-line
          pict line-x below-y 5 0 :foreground (getf *line* :horizontal))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-point
+        (com.informatimago.common-lisp.picture.picture:draw-point
          pict line-x (1- y)  (getf *line* :top-butt))
-        (COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:draw-point
+        (com.informatimago.common-lisp.picture.picture:draw-point
          pict line-x below-y (getf *line* :bottom-left))
         
         (draw-tree-view (subtree-view-right-subtree-view view) (+ line-x 4) above-y pict)
@@ -178,7 +178,7 @@ vertical-height-below  2        2     0
 
 (defun draw-tree (tree)
   (let* ((view (binary-tree-to-view tree))
-         (pict (make-instance 'COM.INFORMATIMAGO.COMMON-LISP.PICTURE.PICTURE:PICTURE
+         (pict (make-instance 'com.informatimago.common-lisp.picture.picture:picture
                    :width  (1+ (subtree-view-width  view))
                    :height (1+ (subtree-view-height view))))
          (x    0)

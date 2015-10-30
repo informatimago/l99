@@ -1,15 +1,1 @@
-From: Paul Rubin <no.email@nospam.invalid>
-Subject: Re: Exercises please
-Newsgroups: comp.lang.lisp
-Date: Tue, 27 Jan 2015 19:30:15 -0800 (28 minutes, 27 seconds ago)
-Organization: A noiseless patient Spider
-Message-ID: <87zj934m60.fsf@jester.gateway.sonic.net>
-
-Helmut Jarausch <hjarausch@gmail.com> writes:
-> Would anybody please recommend online exercises for learning Lisp?
-
-Not Lisp specific but projecteuler.net is nice if you like
-mathematically oriented exercises, and rubyquiz.com is good if you want
-less mathematical ones.  Rubyquiz is intended for Ruby and some of the
-items are Ruby-specific, but lots of them are nice for other languages
-too.
+Informatimago's Solutions to the L-99, Ninety-Nine Lisp Problems

@@ -67,7 +67,7 @@ P05 (*) Reverse a list.
 
 ;; A tail-recursive solution for the reversing of the list in place.
 ;; Notice that cl:nreverse may be implemented without reusing the
-;; input list, cl:nreverse may just call cl:reverse.               
+;; input list, cl:nreverse may just call cl:reverse.
 
 (defun my-nreverse (list)
   (labels ((list-reverse (reverse list)

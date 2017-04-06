@@ -47,21 +47,50 @@ P05 (*) Reverse a list.
 
 
 
+;; Other Common Lisp solutions:
 
-;; (mapcar (lambda (fun) (mapcar fun '(() (a) (a b) (a b c))))
-;;         (list (function iterative-reverse-do)
-;;               (function iterative-reverse-loop)
-;;               (function naive-recursive-reverse)
-;;               (function recursive-reverse)
-;;               (function my-reverse)))
-;; --> ((NIL (A) (B A) (C B A))
-;;      (NIL (A) (B A) (C B A))
-;;      (NIL (A) (B A) (C B A))
-;;      (NIL (A) (B A) (C B A))
-;;      (NIL (A) (B A) (C B A)))
+(defun reduce-reverse-from-start (list)
+  (reduce (lambda (d a) (cons a d)) list :initial-value '()))
+
+(defun reduce-reverse-from-end (list)
+  (reduce (lambda (a d) (append d (list a))) list :initial-value '()  :from-end t))
+
+(defun reduce-reverse-from-end-with-pointer (list)
+  (reduce (let ((pointer nil)
+                (head    nil))
+            (lambda (a d)
+              (if pointer
+                  (setf (cdr pointer) (list a)
+                        pointer (cdr pointer))
+                  (setf head (list a)
+                        pointer head))
+              head))
+          list
+          :initial-value '()
+          :from-end t))
+
+
+(defun revappend-reverse (list)
+  (revappend list nil))
+
+(defun nreconc-reverse (list)
+  (nreconc (copy-list list) nil))
 
 
 
+(mapc (lambda (fun)
+          (assert (equal (mapcar fun '(() (a) (a b) (a b c) (a b c d) (a b c d e)))
+                         '(nil (a) (b a) (c b a) (d c b a) (e d c b a)))))
+      (list (function iterative-reverse-do)
+            (function iterative-reverse-loop)
+            (function naive-recursive-reverse)
+            (function recursive-reverse)
+            (function my-reverse)
+            (function reduce-reverse-from-start)
+            (function reduce-reverse-from-end)
+            (function reduce-reverse-from-end-with-pointer)
+            (function revappend-reverse)
+            (function nreconc-reverse)))
 
 
 
@@ -85,5 +114,14 @@ P05 (*) Reverse a list.
 ;; --> (1)
 ;;     (4 3 2 1)
 
+
+
+(defun nreconc-nreverse (list)
+  (nreconc list nil))
+
+
+
+(defun reduce-append (l1 l2)
+  (reduce (function cons) l1 :initial-value l2 :from-end t))
 
 ;;;; THE END ;;;;

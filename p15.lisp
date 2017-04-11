@@ -56,4 +56,37 @@ P15 (**) Replicate the elements of a list a given number of times.
         (append (repli-one (first list) count)
                 (repli (rest list) count)))))
 
+;; Using loop:
+
+(defun repli (list n)
+  (when list
+    (loop
+      :with current-element
+      :with i := 0
+      :until (and (null list) (zerop i))
+      :if (zerop i)
+        :do (setf i n
+                  current-element (pop list) )
+      :else :do (decf i)
+       :and :collect current-element
+      :end)))
+
+;; (values (repli '(a b c) 3)
+;;         (repli '(a b c) 1)
+;;         (repli '(a b c) 0)
+;;         (repli '(a) 3)
+;;         (repli '(a) 1)
+;;         (repli '(a) 0)
+;;         (repli '() 3)
+;;         (repli '() 0))
+;; (a a a b b b c c c)
+;; (a b c)
+;; nil
+;; (a a a)
+;; (a)
+;; nil
+;; nil
+;; nil
+
+
 ;;;; THE END ;;;;

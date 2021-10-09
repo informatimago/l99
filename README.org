@@ -1,0 +1,117 @@
+# -*- mode:org;coding:utf-8 -*-
+
+* Informatimago's Solutions to the L-99, Ninety-Nine Lisp Problems
+
+Here are solutions to the L-99: Ninety-Nine Lisp Problems, (which themselves are
+derived from a list of prolog problems).
+
+** Working with lists
+
+- [[file://p01.lisp][p01.lisp]] P01 (*) Find the last box of a list.
+- [[file://p02.lisp][p02.lisp]] P02 (*) Find the last but one box of a list.
+- [[file://p03.lisp][p03.lisp]] P03 (*) Find the K'th element of a list.
+- [[file://p04.lisp][p04.lisp]] P04 (*) Find the number of elements of a list.
+- [[file://p05.lisp][p05.lisp]] P05 (*) Reverse a list.
+- [[file://p06.lisp][p06.lisp]] P06 (*) Find out whether a list is a palindrome.
+- [[file://p07.lisp][p07.lisp]] P07 (**) Flatten a nested list structure.
+- [[file://p08.lisp][p08.lisp]] P08 (**) Eliminate consecutive duplicates of list elements.
+- [[file://p09.lisp][p09.lisp]] P09 (**) Pack consecutive duplicates of list elements into sublists.
+- [[file://p10.lisp][p10.lisp]] P10 (*) Run-length encoding of a list.
+- [[file://p11.lisp][p11.lisp]] P11 (*) Modified run-length encoding.
+- [[file://p12.lisp][p12.lisp]] P12 (**) Decode a run-length encoded list.
+- [[file://p13.lisp][p13.lisp]] P13 (**) Run-length encoding of a list (direct solution).
+- [[file://p14.lisp][p14.lisp]] P14 (*) Duplicate the elements of a list.
+- [[file://p15.lisp][p15.lisp]] P15 (**) Replicate the elements of a list a given number of times.
+- [[file://p16.lisp][p16.lisp]] P16 (**) Drop every N'th element from a list.
+- [[file://p17.lisp][p17.lisp]] P17 (*) Split a list into two parts; the length of the first part is given.
+- [[file://p18.lisp][p18.lisp]] P18 (**) Extract a slice from a list.
+- [[file://p19.lisp][p19.lisp]] P19 (**) Rotate a list N places to the left.
+- [[file://p20.lisp][p20.lisp]] P20 (*) Remove the K'th element from a list.
+- [[file://p21.lisp][p21.lisp]] P21 (*) Insert an element at a given position into a list.
+- [[file://p22.lisp][p22.lisp]] P22 (*) Create a list containing all integers within a given range.
+- [[file://p23.lisp][p23.lisp]] P23 (**) Extract a given number of randomly selected elements from a list.
+- [[file://p24.lisp][p24.lisp]] P24 (*) Lotto: Draw N different random numbers from the set 1..M.
+- [[file://p25.lisp][p25.lisp]] P25 (*) Generate a random permutation of the elements of a list.
+- [[file://p26.lisp][p26.lisp]] P26 (**) Generate the combinations of K distinct objects chosen from the N elements of a list
+- [[file://p27.lisp][p27.lisp]] P27 (**) Group the elements of a set into disjoint subsets.
+- [[file://p28.lisp][p28.lisp]] P28 (**) Sorting a list of lists according to length of sublists
+
+** Arithmetic
+
+- [[file://p31.lisp][p31.lisp]] P31 (**) Determine whether a given integer number is prime.
+- [[file://p32.lisp][p32.lisp]] P32 (**) Determine the greatest common divisor of two positive integer numbers.
+- [[file://p33.lisp][p33.lisp]] P33 (*) Determine whether two positive integer numbers are coprime.
+- [[file://p34.lisp][p34.lisp]] P34 (**) Calculate Euler's totient function phi(m).
+- [[file://p35.lisp][p35.lisp]] P35 (**) Determine the prime factors of a given positive integer.
+- [[file://p36.lisp][p36.lisp]] P36 (**) Determine the prime factors of a given positive integer (2).
+- [[file://p37.lisp][p37.lisp]] P37 (**) Calculate Euler's totient function phi(m) (improved).
+- [[file://p38.lisp][p38.lisp]] P38 (*) Compare the two methods of calculating Euler's totient function.
+- [[file://p39.lisp][p39.lisp]] P39 (*) A list of prime numbers.
+- [[file://p40.lisp][p40.lisp]] P40 (**) Goldbach's conjecture.
+- [[file://p41.lisp][p41.lisp]] P41 (**) A list of Goldbach compositions.
+
+** Logic and Codes
+
+- [[file://p46.lisp][p46.lisp]] P46 (**) Truth tables for logical expressions.
+- [[file://p47.lisp][p47.lisp]] P47 (*) Truth tables for logical expressions (2).
+- [[file://p48.lisp][p48.lisp]] P48 (**) Truth tables for logical expressions (3).
+- [[file://p49.lisp][p49.lisp]] P49 (**) Gray code.
+- [[file://p50.lisp][p50.lisp]] P50 (***) Huffman code.
+
+** Binary Trees
+
+- [[file://p54a.lisp][p54a.lisp]] P54A (*) Check whether a given term represents a binary tree
+- [[file://p55.lisp][p55.lisp]] P55 (**) Construct completely balanced binary trees
+- [[file://p56.lisp][p56.lisp]] P56 (**) Symmetric binary trees
+- [[file://p57.lisp][p57.lisp]] P57 (**) Binary search trees (dictionaries)
+- [[file://p58.lisp][p58.lisp]] P58 (**) Generate-and-test paradigm
+- [[file://p59.lisp][p59.lisp]] P59 (**) Construct height-balanced binary trees
+- [[file://p60.lisp][p60.lisp]] P60 (**) Construct height-balanced binary trees with a given number of nodes
+- [[file://p61.lisp][p61.lisp]] P61 (*) Count the leaves of a binary tree
+- [[file://p61a.lisp][p61a.lisp]] P61A (*) Collect the leaves of a binary tree in a list
+- [[file://p62.lisp][p62.lisp]] P62 (*) Collect the internal nodes of a binary tree in a list
+- [[file://p62b.lisp][p62b.lisp]] P62B (*) Collect the nodes at a given level in a list
+- [[file://p63.lisp][p63.lisp]] P63 (**) Construct a complete binary tree
+- [[file://p64.lisp][p64.lisp]] P64 (**) Layout a binary tree (1)
+- [[file://p65.lisp][p65.lisp]] P65 (**) Layout a binary tree (2)
+- [[file://p66.lisp][p66.lisp]] P66 (***) Layout a binary tree (3)
+- [[file://p67.lisp][p67.lisp]] P67 (**) A string representation of binary trees
+- [[file://p68.lisp][p68.lisp]] P68 (**) Preorder and inorder sequences of binary trees
+- [[file://p69.lisp][p69.lisp]] P69 (**) Dotstring representation of binary trees
+
+** Multiway Trees
+
+- [[file://p70b.lisp][p70b.lisp]] P70B (*) Check whether a given term represents a multiway tree
+- [[file://p70c.lisp][p70c.lisp]] P70C (*) Count the nodes of a multiway tree
+- [[file://p70.lisp][p70.lisp]] P70 (**) Tree construction from a node string
+- [[file://p71.lisp][p71.lisp]] P71 (*) Determine the internal path length of a tree
+- [[file://p72.lisp][p72.lisp]] P72 (*) Construct the bottom-up order sequence of the tree nodes
+- [[file://p73.lisp][p73.lisp]] P73 (**) Lisp-like tree representation
+
+** Graphs
+
+- [[file://p80.lisp][p80.lisp]] P80 (***) Conversions
+- [[file://p81.lisp][p81.lisp]] P81 (**) Path from one node to another one
+- [[file://p82.lisp][p82.lisp]] P82 (*) Cycle from a given node
+- [[file://p83.lisp][p83.lisp]] P83 (**) Construct all spanning trees
+- [[file://p84.lisp][p84.lisp]] P84 (**) Construct the minimal spanning tree
+- [[file://p85.lisp][p85.lisp]] P85 (**) Graph isomorphism
+- [[file://p86.lisp][p86.lisp]] P86 (**) Node degree and graph coloration
+- [[file://p87.lisp][p87.lisp]] P87 (**) Depth-first order graph traversal (alternative solution)
+- [[file://p88.lisp][p88.lisp]] P88 (**) Connected components (alternative solution)
+- [[file://p89.lisp][p89.lisp]] P89 (**) Bipartite graphs
+
+** Miscellaneous Problems
+
+- [[file://p90.lisp][p90.lisp]] P90 (**) Eight queens problem
+- [[file://p91.lisp][p91.lisp]] P91 (**) Knight's tour
+- [[file://p92.lisp][p92.lisp]] P92 (***) Von Koch's conjecture
+- [[file://p93.lisp][p93.lisp]] P93 (***) An arithmetic puzzle
+- [[file://p94.lisp][p94.lisp]] P94 (***) Generate K-regular simple graphs with N nodes
+- [[file://p95.lisp][p95.lisp]] P95 (**) English number words
+- [[file://p96.lisp][p96.lisp]] P96 (**) Syntax checker (alternative solution with difference lists)
+- [[file://p97.lisp][p97.lisp]] P97 (**) Sudoku
+- [[file://p98.lisp][p98.lisp]] P98 (***) Nonograms
+- [[file://p99.lisp][p99.lisp]] P99 (***) Crossword puzzle
+
+---------------------------------------------------------------------------------
